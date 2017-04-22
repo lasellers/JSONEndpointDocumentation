@@ -1,10 +1,18 @@
 <?php namespace Intrafoundation;
 
 /**
- *
+*
  * Versions:
  *
- * 0.0.2: Started as Trait, but the  pollution of names in the class the trait was used in
+ * 0.0.4 Noticed an issue with the original regex that extracted the phpdoc:
+ * (\/\*\*)([^*][^\/]*)(\*[\/])(\s*)(\w*)\s(function)\s(\w*)\(
+ * It would skip docblocks that had urls in them. Reworked to overcome that bug.
+ * Also fixed camelCase bug.
+ * Todo: Auto-pop summary + description?
+ *
+ * 0.0.3 Add auto url, summary, description
+ *
+ * 0.0.2: Started as Trait, but the pollution of names in the class the trait was used in
  * bothered me, so changed to an instance class.
  *
  * 0.0.1: Initially we tried using ReflectorClass and getDocComment to get at the function comments,
@@ -16,14 +24,18 @@
 //
 class JSONEndpointDocumentation
 {
+    private $semanticVersion = "0.0.4";
+
     /**
      * @var array
      */
     private $documentTypes = [
         'URL' => [],
-        'Semantic Version' => [],
         'Title' => [],
+        'Summary' => [],
         'Description' => [],
+        'Notes' => [],
+        'Semantic Version' => [],
         'Method' => [
             'values' => ['GET', 'POST', 'DELETE', 'PUT', 'HEAD', 'OPTIONS', 'PATCH']
         ],
@@ -33,7 +45,6 @@ class JSONEndpointDocumentation
         'Success Response' => [],
         'Error Response' => [],
         'Sample Call' => [],
-        'Notes' => [],
         'Cached' => [
             'values' => ['NO', 'YES']
         ],
@@ -55,14 +66,13 @@ class JSONEndpointDocumentation
         $string = preg_replace('/[^0-9a-zA-Z ]/', '', $string);
 
         $index = 0;
-        $string = preg_replace_callback('/\w\S*/', function ($matches) use ($index) {
+        $string = preg_replace_callback('/\w\S*/', function ($matches) use (&$index) {
             $word = $matches[0];
-            if ($index === 0) {
+            if ($index++ === 0) {
                 return strtolower($word);
             } else {
                 return strtoupper(substr($word, 0, 1)) . strtolower(substr($word, 1));
             }
-            $index++;
         }, $string);
 
         $string = preg_replace('/ /', '', $string);
@@ -79,11 +89,11 @@ class JSONEndpointDocumentation
         };
     }
 
-    private function validateValue(string $string,string $documentType): string
+    private function validateValue(string $string, string $documentType): string
     {
-        if(isset($this->documentTypes[$documentType])) {
-            if(isset($this->documentTypes[$documentType]['values'])) {
-                if(in_array($string,$this->documentTypes[$documentType]['values'])) {
+        if (isset($this->documentTypes[$documentType])) {
+            if (isset($this->documentTypes[$documentType]['values'])) {
+                if (in_array($string, $this->documentTypes[$documentType]['values'])) {
                     return $string;
                 } else {
                     return "";
@@ -94,10 +104,13 @@ class JSONEndpointDocumentation
     }
 
     /**
+     * Note this function is heavy. It should be cached in the controller by whatever mechanism other api
+     * calls are being cached.
+     *
      * @param string $class
      * @return object
      */
-    public function createJSONForAllClassFunctions(string $class): \stdClass
+    public function createJSONForAllClassFunctions(string $class, string $url = "/"): \stdClass
     {
         $this->generateCamelCaseForDocumentTypes();
 
@@ -109,35 +122,50 @@ class JSONEndpointDocumentation
          * This regex finds the comment section before any function and returns an array ...
          * Tested on regex101.com
          */
-        $regex = '~(\/\*\*)([^*][^\/]*)(\*[\/])(\s*)(\w*)\s(function)\s(\w*)\(~';
+        $regex = '~(\/\*(\*(?!\/)|[^\*])*\*\/)\s*(\w*)\s(function)\s(\w*)\(~';
         preg_match_all($regex, $contents, $matches);
+
+        $validDocumentTypes = array_column($this->documentTypes, 'name');
 
         $results = [];
 
-        foreach ($matches[2] as $key => $comment) {
-            $accessModifier = $matches[5][$key];
-            $functionName = $matches[7][$key];
+        foreach ($matches[1] as $key => $comment) {
+            $comment = trim(substr($comment, 2, -2));
+            $accessModifier = $matches[3][$key];
+            $functionName = $matches[5][$key];
+
             if ($accessModifier == 'public' && !in_array($functionName, ['__construct'])) {
+
+                if (!isset($results[$functionName])) {
+                    if ($functionName == 'index') {
+                        $results[$functionName] = [
+                            'url' => "{$url}"];
+                    } else {
+                        $results[$functionName] = [
+                            'url' => "{$url}{$functionName}"];
+                    }
+                };
+
                 $lines = explode("\n", trim($comment));
                 foreach ($lines as $line) {
                     $line = trim($line);
                     if (substr($line, 0, 3) == "* @") {
                         $a = explode(" ", substr($line, 3));
                         $documentType = array_shift($a);
-                        $documentString = $this->validateValue(implode(" ", $a),$documentType);
 
-                        if (!isset($results[$functionName])) {
-                            $results[$functionName] = [];
-                        };
+                        if (in_array($documentType, $validDocumentTypes)) {
 
-                        if (isset($results[$functionName][$documentType])) {
-                            if (is_array($results[$functionName][$documentType])) {
-                                $results[$functionName][$documentType][] = $documentString;
+                            $documentString = $this->validateValue(implode(" ", $a), $documentType);
+
+                            if (isset($results[$functionName][$documentType])) {
+                                if (is_array($results[$functionName][$documentType])) {
+                                    $results[$functionName][$documentType][] = $documentString;
+                                } else {
+                                    $results[$functionName][$documentType] = [$results[$functionName][$documentType], $documentString];
+                                }
                             } else {
-                                $results[$functionName][$documentType] = [$results[$functionName][$documentType], $documentString];
+                                $results[$functionName][$documentType] = $documentString;
                             }
-                        } else {
-                            $results[$functionName][$documentType] = $documentString;
                         }
                     }
                 }
