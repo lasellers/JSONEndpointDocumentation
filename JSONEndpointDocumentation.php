@@ -9,7 +9,7 @@
  * /api/posts
  * /api/post?id=5
  * then you could call the createJSONForAllClassFunctions function on the index function (ie, /api) and return the
- * JSON version of the data. This acts as a GET-able index of the functions and descriptions oof their use.
+ * JSON version of the data. This acts as a GET-able index of the functions and descriptions of their use.
  *
  * Versions:
  *
