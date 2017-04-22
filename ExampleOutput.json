@@ -1,6 +1,6 @@
 {
 index: {
-url: "/",
+url: "api/",
 semanticVersion: "1.0.1,",
 title: "Index",
 description: "Lorem Ipsum,",
@@ -17,7 +17,7 @@ cached: "No",
 authentication: "NTLM-Digest"
 },
 news: {
-url: "/news",
+url: "api/news",
 semanticVersion: "1.0.0",
 title: "News",
 successResponse: [
@@ -27,6 +27,6 @@ successResponse: [
 errorResponse: "Code: 401 UNAUTHORIZED Content: { error: "Lorem Ipsum" }"
 },
 comments: {
-url: "/comments"
+url: "api/comments"
 }
 }
