@@ -1,8 +1,19 @@
 <?php namespace Intrafoundation;
 
 /**
-*
+ * This class (for PHP/Laravel 5) scans the DOCBLOCK comments for a function and generates a JSON-able object
+ * that contains an index of public functions and various data that is for use by developers to consume a public API.
+ *
+ * In other words, if you have Endpoints in a class such as:
+ * /api
+ * /api/posts
+ * /api/post?id=5
+ * then you could call the createJSONForAllClassFunctions function on the index function (ie, /api) and return the
+ * JSON version of the data. This acts as a GET-able index of the functions and descriptions oof their use.
+ *
  * Versions:
+ *
+ * 0.0.5 Updated documentation and allowed documentTypes.
  *
  * 0.0.4 Noticed an issue with the original regex that extracted the phpdoc:
  * (\/\*\*)([^*][^\/]*)(\*[\/])(\s*)(\w*)\s(function)\s(\w*)\(
@@ -24,17 +35,20 @@
 //
 class JSONEndpointDocumentation
 {
-    private $semanticVersion = "0.0.4";
+    private $semanticVersion = "0.0.5";
 
     /**
      * @var array
      */
     private $documentTypes = [
+        'API'=>[],
+        'Copyright'=>[],
         'URL' => [],
         'Title' => [],
         'Summary' => [],
         'Description' => [],
         'Notes' => [],
+        'Version'=>[],
         'Semantic Version' => [],
         'Method' => [
             'values' => ['GET', 'POST', 'DELETE', 'PUT', 'HEAD', 'OPTIONS', 'PATCH']
