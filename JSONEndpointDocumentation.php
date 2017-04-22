@@ -144,7 +144,7 @@ class JSONEndpointDocumentation
         $results = [];
 
         foreach ($matches[1] as $key => $comment) {
-            $comment = trim(substr($comment, 2, -2));
+            $comment = trim(substr($comment, 3, -2));
             $accessModifier = $matches[3][$key];
             $functionName = $matches[5][$key];
 
