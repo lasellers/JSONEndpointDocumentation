@@ -1,0 +1,36 @@
+{
+  index: {
+    url: "api/",
+    semanticVersion: "1.0.7,",
+    title: "Index",
+    description: "Lorem Ipsum,",
+    method: "GET",
+    dataParams: "",
+    successResponse: [
+      "Code: 200 Content: { id: 1, name: "Lorem" }",
+      "Code: 200 Content: { id: 1, name: "Lorem", body: "Lorem Ipsum" }"
+    ],
+    errorResponse: "Code: 401 UNAUTHORIZED Content: { error: "Lorem Ipsum" }",
+    sampleCall: "curl http://JSONEndpointDocumentation.app/api/posts",
+    notes: "Lorem Ipsum",
+    cached: "No",
+    authentication: "NTLM-Digest"
+  },
+  posts: {
+    url: "api/posts",
+    semanticVersion: "1.0.0",
+    title: "Posts",
+    successResponse: "Code: 200 Content: [ { id: 1,...} ]",
+    errorResponse: "Code: 401 UNAUTHORIZED Content: { error: "Lorem Ipsum" }"
+  },
+  post: {
+    url: "api/post",
+    semanticVersion: "1.0.0",
+    title: "Post",
+    successResponse: [
+      "Code: 200 Content: { id: 1, name: "Lorem" }",
+      "Code: 200 Content: { id: 2, name: "Lorem", body: "Lorem Ipsum" }"
+    ],
+    errorResponse: "Code: 401 UNAUTHORIZED Content: { error: "Lorem Ipsum" }"
+  }
+}
