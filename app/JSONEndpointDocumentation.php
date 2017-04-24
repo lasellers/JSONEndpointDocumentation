@@ -155,9 +155,9 @@ class JSONEndpointDocumentation
      * calls are being cached.
      *
      * @param string $class
-     * @return object
+     * @return array
      */
-    public function createJSONForAllClassFunctions(string $class, string $url = "/"): \stdClass
+    public function createJSONForAllClassFunctions(string $class, string $url = "/"): array
     {
         $this->generateCamelCaseForDocumentTypes();
 
@@ -210,7 +210,7 @@ class JSONEndpointDocumentation
 
         }
 
-        return (object)$results;
+        return $results;
     }
 
 }

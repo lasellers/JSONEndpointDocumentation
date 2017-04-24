@@ -48,7 +48,7 @@ class APIController extends Controller
      * @authentication NTLM-Digest
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
         static $results;
         if ($results == null) {
@@ -57,7 +57,7 @@ class APIController extends Controller
         }
 
         return response()
-            ->json((object)$results);
+            ->json((array)$results);
     }
 
     /**
@@ -67,9 +67,9 @@ class APIController extends Controller
      * @successResponse Code: 200 Content: [ { id: 1,...} ]
      * @errorResponse Code: 401 UNAUTHORIZED Content: { error: "Lorem Ipsum" }
      */
-    public function posts()
+    public function posts(Request $request)
     {
-        $posts = $this->posts;
+        $posts = (array)$this->posts;
         return response()
             ->json($posts);
     }
@@ -78,7 +78,7 @@ class APIController extends Controller
     {
         foreach ($array as $key => $item) {
             if ($item[$field] == $id) {
-                return $key;
+                return $item;
             }
         }
         return null;
@@ -92,11 +92,11 @@ class APIController extends Controller
      * @successResponse Code: 200 Content: { id: 2, name: "Lorem", body: "Lorem Ipsum" }
      * @errorResponse Code: 401 UNAUTHORIZED Content: { error: "Lorem Ipsum" }
      */
-    public function post(integer $id)
+    public function post(Request $request)
     {
-        $id = Request::input('id');
+        $id = $request->input('id');
 
-        $post = arraySearchByField('id', $id, $this->posts);
+        $post = $this->arraySearchByField($id,'id', $this->posts);
 
         return response()
             ->json($post);
