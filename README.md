@@ -14,6 +14,8 @@ that contains an index of public functions and various data that is for use by d
  then you could call the createJSONForAllClassFunctions function on the index function (ie, /api) and return the
  JSON version of the data. This acts as a GET-able index of the functions and descriptions of their use.
 
+See https://github.com/lasellers/JSONEndpointDocumentation/blob/master/app/JSONEndpointDocumentation.php for the actual class.
+
 ![JSONEndpointDocumentation](https://github.com/lasellers/JSONEndpointDocumentation/blob/master/screenshot1.png)
 
 ## Installation / Use
