@@ -3,26 +3,19 @@
 use Laravel\Lumen\Testing\DatabaseMigrations;
 use Laravel\Lumen\Testing\DatabaseTransactions;
 
-class ExampleTest extends TestCase
+class APITest extends TestCase
 {
     /**
      * A basic test example.
      *
      * @return void
      */
-    /*  public function testExample()
-      {
-          $this->get('/');
-
-          $this->assertEquals(
-              $this->app->version(), $this->response->getContent()
-          );
-
-          $content = $this->get('/v1/users/1')->seeStatusCode(200)->response->getContent();
-          $data = $this->get('/api')->seeStatusCode(200)->decodeResponseJson();
-      }
-  */
-
+    public function testWebServer()
+    {
+        $response = $this->get('/');
+        $response->seeStatusCode(200);
+        //  $response->assertStatus(200);
+    }
 
     public function testAPI()
     {
