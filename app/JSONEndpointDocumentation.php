@@ -130,8 +130,6 @@ class JSONEndpointDocumentation
         $regex = '~(\/\*(\*(?!\/)|[^\*])*\*\/)\s*(\w*)\s(function)\s(\w*)\(~';
         preg_match_all($regex, $contents, $matches);
 
-      //  $validDocumentTypes = array_column($this->documentTypes, 'name');
-
         $functions = [];
 
         foreach ($matches[1] as $key => $comment) {
